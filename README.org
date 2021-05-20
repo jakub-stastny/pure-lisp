@@ -130,6 +130,39 @@ Test your logic thoroughly and just click through the app to see that the platfo
 
 ** Macros and reader macros
 
+** Namespaces
+
+#+BEGIN_SRC lisp
+(export (function test() (puts "Hello world!"))
+(export (const contact-email "joe@doe.com"))
+#+END_SRC
+
+#+BEGIN_SRC lisp
+(import { test } from custom-functions) ; Will fail to compile if there's no test.
+(import * as helpers from myorg.tools.helpers)
+#+END_SRC
+
+? Should I support default exports ?
+
+#+BEGIN_SRC lisp
+(export default (function test() (puts "Hello world!"))
+#+END_SRC
+
+It makes sense in OOP, where you export the whole class. But here it may or may not be useful. Yet – I'm not saying no, after all, you can export a high order function that wraps every other function in the file. So probably it makes sense.
+
+** Data types and polymorphism
+
+#+BEGIN_SRC lisp
+(type Triangle (point-a point-b point-c))
+(type Circle (central-point size))
+
+(generic draw (object)
+  (:documentation "Draws a geometrical object"))
+  
+(method draw (object Triangle) (...))
+(method draw (object Circle) (...))
+#+END_SRC
+
 * Design decisions
 
 ** Embedded programming language
@@ -186,6 +219,8 @@ So we need to load all the statements as one list. That way we can implement eve
 #+BEGIN_SRC lisp
 ; Developer provided macros.
 (macro entry (date properties) (...))
+
+(load-s-expressions (read vfs "custom-functions.lisp"))
 #+END_SRC
 
 #+BEGIN_SRC javascript
