@@ -221,11 +221,17 @@ This will need some help to expand it to:
 So we need to load all the statements as one list. That way we can implement everything in pure functions, avoiding having to do ~@entries ||= Array.new~ and ~@entries << entry~.
 
 #+BEGIN_SRC lisp
-(import { parse } from core.parser)
-; Developer provided macros.
-(macro entry (date properties) (...))
+(import { parse expand-macros } from core.parser)
 
-(const entries (parse (read vfs "custom-functions.lisp")))
+; Developer provided macros.
+(macro entry (date-string properties) (mkentry date-string properties))
+
+(function mkentry (date-string properties)
+ (mkinstance Entry date-string properties))
+
+; Returns entries.
+(expose (function main (vfs) (
+   (run (expand-macros (parse (read vfs "custom-functions.lisp")))))))
 #+END_SRC
 
 #+BEGIN_SRC javascript
@@ -233,7 +239,7 @@ function main() {
   await const pureLispCompiler = loadModule('pure-lisp-compiler.wasm)
   await const pureLispRuntime = loadModule('pure-lisp-runtime.wasm')
 
-  pureLispRuntime.loadByteCode(pureLispCompiler.load(<macro-module-code>))
-  const entries = pureLispRuntime.loadByteCodeAsList(pureLispCompiler.load(<user-defined-code>))
+  const program = pureLispRuntime.loadByteCode(pureLispCompiler.load(<macro-module-code>))
+  const entries = program.main(vfs)
 }
 #+END_SRC
