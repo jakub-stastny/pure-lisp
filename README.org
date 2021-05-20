@@ -52,29 +52,25 @@ Namely you can run PureLisp in a browser, within an iOS/iPadOS app and on the se
 
 ** 100% secure
 
-Since WebAssembly runtime is a container[1] and there are no OS bindings, there is no way to access the file system from PureLisp (there is from the host language of course) and there is no way to run external commands or execute OS syscalls.
+Since WebAssembly runtime is sandboxed and there are no OS bindings, there is no way to access the file system from PureLisp (there is from the host language of course) and there is no way to run external commands, execute OS syscalls or fetch data from the internet.
 
-[1] It's not, but I can't remember the right word now.
-[2] How about network? Should we allow fetch()? Does WASM support that at all? We would have to implement exceptions though :/
+Sure, we could use WASI that wants to fill the gap, but that's just not the way we want to go about this.
 
 ** Functional programming
+
+** No runtime exceptions
+
+*** TODO: Brainstorm this
+
+We won't have =Errno::ENOENT=s flying around, but there's always programmer's error, say passing wrong arguments =(+ 1 "2").
+
+I think these could be (all?) checked on compile time.
 
 ** Virtual FS
 
 Since there are no side effects, reading or writing files is not possible in PureLisp.
 
 Fortunately there's a simple workaround, that's totally FP-friendly.
-
-#+BEGIN_SRC javascript
-function main() {
-  const blogPostSources = VirtualFS.read('~/blog')
-  const blogPostOutput = VirtualFS.open('output')
-  const updatedVirtualFS = pureLispRuntime.generate(blogPostSources, blogPostOutput)
-  updatedVirtualFS.commit()
-}
-#+END_SRC
-
-If no I/O actions are required, VFS can be created from within PureLisp:
 
 #+BEGIN_SRC lisp
 (expose (function generate-from-scratch (sources-vfs) (
@@ -85,11 +81,50 @@ If no I/O actions are required, VFS can be created from within PureLisp:
 
 #+BEGIN_SRC javascript
 function main() {
-  const blogPostSources = VirtualFS.read('~/blog')
+  const blogPostSources = VirtualFS.read('~/blog', {pattern: '**/*.org') // Or: ignore: '**/*.swp', or: gitignore: true.
+  // This construct an object:
+  // {root: true, type: 'directory', entries: [{type: 'directory', name: 'src', entries: [...]}, {{type: 'file', name: 'README.org', content: "..."}]}
   const outputVFS = pureLispRuntime.generate(blogPostSources, blogPostOutput)
   outputVFS.commit('output')
 }
 #+END_SRC
+
+If we need some initial state of the virtual FS, we need to provide that from the host language:
+
+#+BEGIN_SRC javascript
+function main() {
+  const blogPostSources = VirtualFS.read('~/blog')
+  const blogPostOutput = VirtualFS.open('output')
+  const updatedVirtualFS = pureLispRuntime.generate(blogPostSources, blogPostOutput)
+  updatedVirtualFS.commit()
+}
+#+END_SRC
+
+** Concurrency and UI tools of your choice
+
+There's no need for locks, since there are no mutable data.
+
+#+BEGIN_SRC javascript
+function main() {
+  const blogPostSources = VirtualFS.read('~/blog')
+  const vdirectories = blogPostSources.glob(/^\d{4}\//).map(vdirectory => {
+    const thread = new Thread()
+      thread.execute(() => {
+      blogPostAPI.generate(vdirectory)
+    })
+  })
+  
+  vdirectories.forEach(vdir => vdir.commit())
+}
+#+END_SRC
+
+** Testing
+
+If the logic is clearly separated from side effects, testing is easy!
+
+I don't think testing the UI and sideeffects is all that useful. It's typically slow (think automating the browser), platform-specific (think IE vs FF) and often just impossible.
+
+Test your logic thoroughly and just click through the app to see that the platform-specific code works.
 
 ** Macros and reader macros
 
