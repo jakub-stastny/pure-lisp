@@ -68,6 +68,8 @@ I think these could be (all?) checked on compile time.
 
 ** Virtual FS
 
+Same idea as virtual DOM in React.js or Elm.
+
 Since there are no side effects, reading or writing files is not possible in PureLisp.
 
 Fortunately there's a simple workaround, that's totally FP-friendly.
@@ -140,3 +142,58 @@ There are bunch of things it doesn't do:
 
 - It can't run external commands.
 - It has no bindings to low-level
+
+* Examples
+
+** Basic example
+
+#+BEGIN_SRC lisp
+(expose (function load-post (org-mode-string) (...)))
+(expose (function generate-json (post) (...)))
+#+END_SRC
+
+#+BEGIN_SRC javascript
+function main() {
+  await const pureLispRuntime = loadModule('pure-lisp-runtime.wasm')
+  const blogGeneratorAPI = pureLispRuntime.loadByteCode(<compiled-from-the-lisp-code-from-above>)
+
+  blogGeneratorAPI.generateJson(
+    blogGeneratorAPI.loadPost(File.read(<path>))) ; <- We avoided side functions in PureLisp!
+}
+#+END_SRC
+
+** Example with user-defined functions
+
+#+BEGIN_SRC lisp
+; User defined script.
+(entry 1/6/2021 (
+  (budget cw:1200 - b:200)))
+
+(entry 7/6/2021 (
+  (budget cw:1200 - b:200)))
+#+END_SRC
+
+This will need some help to expand it to:
+
+#+BEGIN_SRC lisp
+; We end up with a list of entries.
+((mkentry "1/6/2021" (budget "cw:1200 - b:200"))
+ (mkentry "7/6/2021" (budget "cw:1200 - b:200")))
+#+END_SRC
+
+So we need to load all the statements as one list. That way we can implement everything in pure functions, avoiding having to do `@entries ||= Array.new` and `@entries << entry`.
+
+#+BEGIN_SRC lisp
+; Developer provided macros.
+(macro entry (date properties) (...))
+#+END_SRC
+
+#+BEGIN_SRC javascript
+function main() {
+  await const pureLispCompiler = loadModule('pure-lisp-compiler.wasm)
+  await const pureLispRuntime = loadModule('pure-lisp-runtime.wasm')
+
+  pureLispRuntime.loadByteCode(pureLispCompiler.load(<macro-module-code>))
+  const entries = pureLispRuntime.loadByteCodeAsList(pureLispCompiler.load(<user-defined-code>))
+}
+#+END_SRC
