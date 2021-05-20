@@ -1,0 +1,55 @@
+* About
+
+PureLisp is a programming language that runs on any WebAssembly-enabled platform that's meant for writing platform-independent tools, which can be used on any platform.
+
+It is a 100% functional programming language and as such it has no mutable data and no side effects.
+
+Before you start to wonder whether this is April fools' joke, let me explain: you don't need any side effects in PureLisp, because the host platform can provide them.
+
+* Why?
+
+Domain specific languages are seriously underrated. If someone wants to design a programming language, they nearly always go for a generic purpose programming language.
+
+It seems to make sense, after all why shouldn't you be able to write anything in such language.
+
+But the reality is more intricate than that and specialisation in many cases does pay off.
+
+Take Elm for instance: it made its trade-offs and because of them it's an absolutely amazing language for writing web apps.
+
+And this is what PureLisp is trying to accomplish for multi-platform data libraries.
+
+* Multiplatform code
+
+
+
+* Features
+
+** Write once, run anywhere
+
+What Java didn't manage to deliver, WebAssembly did. And since PureLisp is written for the WebAssembly platform, you get all the benefits.
+
+Namely you can run PureLisp in a browser, within an iOS/iPadOS app and on the server by embedding it into runtime of your choice (Rust, Node.js, Ruby, you name it).
+
+** 100% secure
+
+Since WebAssembly runtime is a container[1] and there are no OS bindings, there is no way to access the file system from PureLisp (there is from the host language of course) and there is no way to run external commands or execute OS syscalls.
+
+[1] It's not, but I can't remember the right word now.
+[2] How about network? Should we allow fetch()? Does WASM support that at all?
+
+** Functional programming
+
+** Macros and reader macros
+
+* Design decisions
+
+** Embedded programming language
+
+/PureLisp is not a generic programming language./
+
+This is the most important thing to keep in mind.
+
+There are bunch of things it doesn't do:
+
+- It can't run external commands.
+- It has no bindings to low-level
