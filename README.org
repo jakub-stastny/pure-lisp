@@ -20,7 +20,27 @@ And this is what PureLisp is trying to accomplish for multi-platform data librar
 
 * Multiplatform code
 
+Back in the days you could write an app in C and make it run on any platform. It would have a lot of platform specific code (especially for implementing the GUI), but it was totally possible.
 
+Then the mobile platform came and suddenly you can only write in Swift or Objective C for iOS, ......... how is it on Android? Is Kotlin enforced or can you use any language? After all, it's Linux.
+
+This complicates everything and makes development more expensive.
+
+So someone comes and says "F-it! Let's write in HTML/CSS/JS and let's just have a WebView wrappers for them."
+
+And it works. You have your hybrid app and it runs on Windows, macOS, Linux, it runs on iOS and it runs on Android.
+
+But something's off. It just doesn't look right. It doesn't behave right either. And it's missing the wow factor of a good iOS app. Not mention that it's not the fastest thing in the universe either.
+
+Having to write native UI for each platform is just the way it is if you want your app to be any good. There are some exceptions that managed to get away with the hybrid approach, but they are few and far between.
+
+So then? Do we have to always port /everything/ to every supported platform?
+
+Well, no!
+
+Write the platform-specific UI in whatever language is required by the platform, but write the logic in something that runs anywhere.
+
+Enter PureLisp.
 
 * Features
 
@@ -35,9 +55,41 @@ Namely you can run PureLisp in a browser, within an iOS/iPadOS app and on the se
 Since WebAssembly runtime is a container[1] and there are no OS bindings, there is no way to access the file system from PureLisp (there is from the host language of course) and there is no way to run external commands or execute OS syscalls.
 
 [1] It's not, but I can't remember the right word now.
-[2] How about network? Should we allow fetch()? Does WASM support that at all?
+[2] How about network? Should we allow fetch()? Does WASM support that at all? We would have to implement exceptions though :/
 
 ** Functional programming
+
+** Virtual FS
+
+Since there are no side effects, reading or writing files is not possible in PureLisp.
+
+Fortunately there's a simple workaround, that's totally FP-friendly.
+
+#+BEGIN_SRC javascript
+function main() {
+  const blogPostSources = VirtualFS.read('~/blog')
+  const blogPostOutput = VirtualFS.open('output')
+  const updatedVirtualFS = pureLispRuntime.generate(blogPostSources, blogPostOutput)
+  updatedVirtualFS.commit()
+}
+#+END_SRC
+
+If no I/O actions are required, VFS can be created from within PureLisp:
+
+#+BEGIN_SRC lisp
+(expose (function generate-from-scratch (sources-vfs) (
+  (mkvfs (
+    (map (glob sources-vfs "*.org")
+         lambda (stream) (generate-blog-post stream)))))))
+#+END_SRC
+
+#+BEGIN_SRC javascript
+function main() {
+  const blogPostSources = VirtualFS.read('~/blog')
+  const outputVFS = pureLispRuntime.generate(blogPostSources, blogPostOutput)
+  outputVFS.commit('output')
+}
+#+END_SRC
 
 ** Macros and reader macros
 
