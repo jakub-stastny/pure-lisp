@@ -245,3 +245,7 @@ function main() {
   const entries = program.main(vfs)
 }
 #+END_SRC
+
+* Notes
+
+- It isn't preferred to pass CLI args, since CLI is a platform specific thing.
