@@ -138,7 +138,7 @@ Test your logic thoroughly and just click through the app to see that the platfo
 #+END_SRC
 
 #+BEGIN_SRC lisp
-(import { test } from custom-functions) ; Will fail to compile if there's no test.
+(import { test as my-test } from custom-functions) ; Will fail to compile if there's no test.
 (import * as helpers from myorg.tools.helpers)
 #+END_SRC
 
@@ -149,6 +149,8 @@ Test your logic thoroughly and just click through the app to see that the platfo
 #+END_SRC
 
 It makes sense in OOP, where you export the whole class. But here it may or may not be useful. Yet – I'm not saying no, after all, you can export a high order function that wraps every other function in the file. So probably it makes sense.
+
+BTW common modules supports also this: =import SomeThing, { another } from mymodule=.
 
 ** Data types and polymorphism
 
@@ -216,13 +218,14 @@ This will need some help to expand it to:
  (mkentry "7/6/2021" (budget "cw:1200 - b:200")))
 #+END_SRC
 
-So we need to load all the statements as one list. That way we can implement everything in pure functions, avoiding having to do `@entries ||= Array.new` and `@entries << entry`.
+So we need to load all the statements as one list. That way we can implement everything in pure functions, avoiding having to do ~@entries ||= Array.new~ and ~@entries << entry~.
 
 #+BEGIN_SRC lisp
+(import { parse } from core.parser)
 ; Developer provided macros.
 (macro entry (date properties) (...))
 
-(load-s-expressions (read vfs "custom-functions.lisp"))
+(const entries (parse (read vfs "custom-functions.lisp")))
 #+END_SRC
 
 #+BEGIN_SRC javascript
