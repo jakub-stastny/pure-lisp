@@ -163,6 +163,8 @@ It makes sense in OOP, where you export the whole class. But here it may or may 
 (method draw (object Circle) (...))
 #+END_SRC
 
+What's so great about not going for class OOP? The types are not any special types, they are all essentially named maps and can be easily passed between the host system and PureLisp or (de)serialise to/from JSON.
+
 * Design decisions
 
 ** Embedded programming language
