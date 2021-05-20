@@ -204,10 +204,12 @@ function main() {
 #+BEGIN_SRC lisp
 ; User defined script.
 (entry 1/6/2021 (
-  (budget cw:1200 - b:200)))
+  (budget cw:1200 - b:200)
+  (spending-curve (+ 300 n) n n n (+ 150 n) n n)))
 
 (entry 7/6/2021 (
-  (budget cw:1200 - b:200)))
+  (budget cw:1200 - b:200)
+  (spending-curve (+ 300 n) n n n (+ 150 n) n n)))
 #+END_SRC
 
 This will need some help to expand it to:
