@@ -2,33 +2,53 @@
 #+AUTHOR: Jakub Šťastný
 
 * Host
-** Node.js bindings
-
-Run as a command-line program.
+** Node.js command-line script
 
 *Usage:* =$0 [blog-post-sources] [output-directory]=
 
 #+BEGIN_SRC javascript
-function main(args) {
-  const outputVFS = pureLispRuntime.generate(
-    vfs.read(args[0], {pattern: '**/*.org'}))
+import vfs from '@jakub-stastny/vfs'
 
-  outputVFS.commit(args[1])
-}
+const outputVFS = pureLispRuntime.generate(
+  vfs.read(process.argv[0], {pattern: '**/*.org'}))
+
+outputVFS.commit(process.argv[1])
 #+END_SRC
 
-** iOS/iPadOS bindings
+*** TODO Find out if Deno also supports WebAssembly modules
 
-*** TODO How would it work?
+I do still prefer it, even though there isn't much code to worry about, but it has permissions and one can restrict what files can be read and written.
+
+** iOS/iPadOS app
+
+The app is a simple interface that allows editing the blog post source files, their preview using target web styles and building the whole tree to a directory which then can be set as synced folder in Working Copy and pushed to GitHub.
+
+The preview functionality is platform-dependent (we are instantiating WebView) and so is file editing. It is therefore not part of PureLisp responsibilities and we implement these in Swift and SwiftUI.
+
+What is responsibility of our PureLisp system is the *build* button. Tapping it will run the code, which will then generate contents of a directory and we can go and push it to GitHub using WorkingCopy.
+
+*** TODO Implement in pseudocode
 
 #+BEGIN_SRC swift
 #+END_SRC
 
-** Browser bindings
+** Web app
 
-*** TODO How would it work?
+The idea is same as the iOS app, only that we push directly to GitHub via GitHub API.
 
-Potentially it could use say GH API to write the files. Or =localStorage=, but having posts in there would be rather useless.
+*** TODO Implement in pseudocode
 
 #+BEGIN_SRC javascript
 #+END_SRC
+
+** Summary
+
+You might be wondering whether it was worth it at all – after all a lot of code is still written in platform-specific technologies.
+
+But don't forget that there is no way around writing some platform specific code!
+
+We accomplished what was reasonably possible: have our data library on all the platforms.
+
+And that was worth it: no need to look for various parsers of Org mode for each language used, parsers that could potentially be incompatible or incomplete. No need to debug multiple data libraries. And better yet – knowing that if we need to fix a bug or add a feature, we do it only once – and we know for sure that if it works, it works everywhere.
+
+That is the very reason for PureLisp. It's not a silver bullet, but it's awesome in what it does.
