@@ -1,0 +1,49 @@
+#+TITLE:  Blog generator library
+#+AUTHOR: Jakub Šťastný
+
+* Spending data
+
+#+BEGIN_SRC lisp
+; User defined script.
+(entry 1/6/2021 (
+  (budget cw:1200 - b:200)
+  (spending-curve (+ 300 n) n n n (+ 150 n) n n)))
+
+(entry 7/6/2021 (
+  (budget cw:1200 - b:200)
+  (spending-curve (+ 300 n) n n n (+ 150 n) n n)))
+#+END_SRC
+
+This will need some help to expand it to:
+
+#+BEGIN_SRC lisp
+; We end up with a list of entries.
+((mkentry "1/6/2021" (budget "cw:1200 - b:200"))
+ (mkentry "7/6/2021" (budget "cw:1200 - b:200")))
+#+END_SRC
+
+So we need to load all the statements as one list. That way we can implement everything in pure functions, avoiding having to do ~@entries ||= Array.new~ and ~@entries << entry~.
+
+#+BEGIN_SRC lisp
+(import { parse expand-macros } from core.parser)
+
+; Developer provided macros.
+(macro entry (date-string properties) (mkentry date-string properties))
+
+(function mkentry (date-string properties)
+ (mkinstance Entry date-string properties))
+
+; Returns entries.
+(expose (function main (vfs) (
+   (run (expand-macros (parse (read vfs "custom-functions.lisp")))))))
+#+END_SRC
+
+#+BEGIN_SRC javascript
+function main() {
+  await const pureLispCompiler = loadModule('pure-lisp-compiler.wasm)
+  await const pureLispRuntime = loadModule('pure-lisp-runtime.wasm')
+
+  const program = pureLispRuntime.loadByteCode(pureLispCompiler.load(<macro-module-code>))
+  const entries = program.main(vfs)
+}
+#+END_SRC

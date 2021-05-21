@@ -1,0 +1,45 @@
+#+TITLE:  Spending data host integration
+#+AUTHOR: Jakub Šťastný
+
+* Host
+** Ruby interactive console
+
+*Usage:* =$0 [spending-data-directory]=
+
+The Ruby console is very nice to work with. Let's inspect the data there!
+
+#+BEGIN_SRC ruby
+require 'wasmer'
+require 'pure-lisp-vfs'
+require 'pry'
+
+pureLispRuntime = Wasmer.load('pure-lisp.wasm')
+
+entries = pureLispRuntime.load(VFS.read(ARGV.first, pattern: '*.entry'))
+
+binding.pry
+#+END_SRC
+
+** iOS/iPadOS app
+
+- Collect your spending data on the go.
+- Calculates spending curve.
+- Calculates where in the curve are you doing the week.
+- Provides a widget with these calculations and colour indication of whether you're on target or not.
+
+*** TODO Implement in pseudocode
+
+#+BEGIN_SRC swift
+#+END_SRC
+
+** Web app
+
+*** TODO Describe
+*** TODO Implement in pseudocode
+
+#+BEGIN_SRC javascript
+#+END_SRC
+
+** Summary
+
+*** TODO Describe
