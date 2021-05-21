@@ -62,7 +62,7 @@ Sure, we could use WASI that wants to fill the gap, but that's just not the way 
 
 *** TODO: Brainstorm this
 
-We won't have =Errno::ENOENT=s flying around, but there's always programmer's error, say passing wrong arguments =(+ 1 "2").
+We won't have =Errno::ENOENT='s flying around, but there's always programmer's error, say passing wrong arguments =(+ 1 "2")=.
 
 I think these could be (all?) checked on compile time.
 
