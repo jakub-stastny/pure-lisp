@@ -34,3 +34,5 @@ Dynamic features are implemented using PureLisp runtime, which is compiled into 
 Each project is compiled into (typically one) WASM module, which includes PureLisp runtime and the project itself.
 
 Would we need to load say user-defined scripts at the run time, we need to do dynamic compilation: to compile the source to a new WASM module, which we can then load.
+
+** [[file:mplisp/mplisp.org][MPureLisp]]
