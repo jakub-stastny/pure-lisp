@@ -120,6 +120,28 @@ function main() {
 }
 #+END_SRC
 
+** Speed
+
+https://en.wikipedia.org/wiki/Referential_transparency
+
+/The importance of referential transparency is that it allows the programmer and the compiler to reason about program behavior as a rewrite system. This can help in proving correctness, simplifying an algorithm, assisting in modifying code without breaking it, or optimizing code by means of memoization, common subexpression elimination, lazy evaluation, or parallelization./
+
+** Strongly typed
+
+#+BEGIN_SRC lisp
+(type Contact :name :email? :number?)
+
+(function mkinvitation (Contact contact) (String template)
+  (mkinstance Invitation
+    (:body (gsub /%NAME%/ contact.name))
+    (:email contact.email)))
+#+END_SRC
+
+How to deal with maybe?
+
+also support interfaces and (ContactInterface contact)
+Partial interface: specify only prerties required by the function.
+
 ** Testing
 
 If the logic is clearly separated from side effects, testing is easy!
@@ -152,7 +174,7 @@ It makes sense in OOP, where you export the whole class. But here it may or may 
 
 BTW common modules supports also this: =import SomeThing, { another } from mymodule=.
 
-** Data types and polymorphism
+** Polymorphism via type classes
 
 #+BEGIN_SRC lisp
 (type Triangle (point-a point-b point-c))
@@ -166,6 +188,10 @@ BTW common modules supports also this: =import SomeThing, { another } from mymod
 #+END_SRC
 
 What's so great about not going for class OOP? The types are not any special types, they are all essentially named maps and can be easily passed between the host system and PureLisp or (de)serialise to/from JSON.
+
+Function pverloading https://en.wikipedia.org/wiki/Function_overloading
+
+https://existentialtype.wordpress.com/2011/03/19/dynamic-languages-are-static-languages/
 
 * Design decisions
 
