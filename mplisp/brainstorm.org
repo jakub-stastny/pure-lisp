@@ -1,0 +1,15 @@
+* Macros
+
+When should these be evaluated?
+
+Here I want to read a file and then process it.
+
+#+BEGIN_SRC lisp
+(compile-to-wat (build-s-expressions (read-file (car ARGV))))
+#+END_SRC
+
+** Let's try with a function
+
+#+BEGIN_SRC lisp
+(compile-to-wat (build-s-expressions (read-file (car ARGV))))
+#+END_SRC

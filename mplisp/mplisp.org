@@ -1,6 +1,11 @@
-* Minimal PureLisp
+#+TITLE:  MPureLisp
+#+AUTHOR: Jakub Šťastný
 
-Minimal subset of PureLisp required to implement PureLisp in PureLisp.
+* MPureLisp
+
+MPureLisp stands for "minimal PureLisp".
+
+It is a subset of PureLisp required to implement PureLisp in (M)PureLisp.
 
 Written in Common Lisp and once ready, it will be ported on top of the PureLisp compiler.
 
@@ -31,7 +36,10 @@ It might be best to start with 3rd party modules to bootstrap fast and then slow
 #+BEGIN_SRC lisp
 #!/usr/bin/env sbcl
 
+; TODO: should =function= actually define a function or should it generate WAT?
 (defmacro function (&rest args) (defun args))
+
+(compile-to-wat (car ARGV))
 #+END_SRC
 
 ** TODO Implement WAT generator in MPureLisp
