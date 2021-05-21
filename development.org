@@ -34,31 +34,3 @@ Dynamic features are implemented using PureLisp runtime, which is compiled into 
 Each project is compiled into (typically one) WASM module, which includes PureLisp runtime and the project itself.
 
 Would we need to load say user-defined scripts at the run time, we need to do dynamic compilation: to compile the source to a new WASM module, which we can then load.
-
-** Minimal PureLisp
-
-Minimal subset of PureLisp required to implement PureLisp in PureLisp.
-
-Written in Common Lisp and once ready, it will be ported on top of the PureLisp compiler.
-
-*** TODO Is it wise to use JSON for the AST?
-
-Because then reading JSON is a necessary feature of MPureLisp, replacing need for one (simple) parser by a need for another one (and a potentially more complex one).
-
-Maybe we should skip the parser in Rust altogether and just implement MPureLisp in CLisp and then port it on top of MPureLisp.
-
-We could potentially avoid the issue if there's a WASM module for parsing JSON, but still.
-
-**** TODO Find an example how to write a Lisp parser in Lisp
-
-*** Going forwards
-
-Either the PureLisp compiler be written in MPureLisp itself forewer or it can be kept ported on the newer versions of PureLisp as they are developed:
-
-Implement new functionality in the compiler -> compile by the current compiler to WAT -> compile WAT to WASM -> run all tests -> if passed, rename the new module to =plisp.wasm=, making it the official compiler module -> the new functionality is available for usage in the compiler code itself.
-
-** Implementing new features
-
-Either in MPureLisp (and later in PureLisp, would I decide for that approach) OR via WASM modules.
-
-It might be best to start with 3rd party modules to bootstrap fast and then slowly replace them with PureLisp own version (it'd be most educational to write say RegExp engine).
