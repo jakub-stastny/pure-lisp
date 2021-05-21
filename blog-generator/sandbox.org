@@ -1,0 +1,47 @@
+#+TITLE:  Blog generator library
+#+AUTHOR: Jakub Šťastný
+
+* Blog generator
+
+** The entry point =generate=
+This function takes virtual FS =source-vfs= of the blog post Org sources and returns a new virtual FS, which represents the contents of the output directory.
+
+#+BEGIN_SRC lisp
+(import { generate-json } from json-parser)
+
+(expose (function generate (source-vfs) (
+  (const posts (map (glob source-vfs "*.org")
+    (λ (file) (
+       (const slug (sub /\.org/ '.json' (basename file.path)))
+       (const post (generate-post-object slug (read file)))))))
+
+  (const published-posts ((filter posts (λ () (post.draft)))))
+
+  (mkvfs
+    (:entries (map published-posts (λ (post) (
+      (vfs.mkdir post.slug
+        (:entries (vfs.mkfile
+          (vfs.join post.slug (concat post.slug ".json")))
+          (generate-json post)))))))))))
+#+END_SRC
+
+All you need to do in the host environment is to write the VFS contents to the FS.
+
+* Function =generate-post-object=
+
+This is where we map the information in the Org mode format to Post properties, making it ready to be exported as JSON.
+
+#+BEGIN_SRC lisp
+(import * as parser from org-mode-parser)
+
+(type Post (:title :slug :excerpt :body :tags))
+
+(function generate-post-object (slug org-mode-string) (
+  (const document (parser.parse org-mode-string))
+  (mkinstance Post
+    (:title document.title)
+    (:slug slug)
+    (:excerpt (parser.get-path "p:first" document)
+    (:body document.body)
+    (:tags document.tags)))))
+#+END_SRC
